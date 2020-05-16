@@ -1,4 +1,7 @@
 const HttpError = require('../models/http-error');
+const {v4:uuidv4} = require('uuid');
+const {validationResult}=require('express-validator');
+
 let DUMMY_PLACES = [
 
     {
@@ -50,8 +53,15 @@ const getPlaceByUser = (req,res,next) =>{
     res.json({place: place});
 }
 const createPlace = (req,res,next) =>{
+   const error=validationResult(req);
+   if(!(error.isEmpty())){
+       console.log(error);
+       throw new HttpError('no valido argunto ',422);
+   }
+   
     const{title,description,coordinates,address,creator} = req.body;
     const createPlace={
+        id: uuidv4(),
         title,
         description,
         location:coordinates,
@@ -59,11 +69,18 @@ const createPlace = (req,res,next) =>{
         creator
     }
     DUMMY_PLACES.push(createPlace);
-    res.status(201).json({message: 'se agrego al place exitosamente'});
+    res.status(201).json({place:createPlace});
     
 };
 
 const updatePlace = (req, res, next)=>{
+    const error=validationResult(req);
+
+    if(!(error.isEmpty())){
+        Console.log(error);
+        throw new HttpError('ARGUMENTOS INVALIDO');
+    }
+
     const{title, description} = req.body;
     const placeId = req.params.pid;
 
